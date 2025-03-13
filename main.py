@@ -1,22 +1,21 @@
 from random import randint
 from csv import reader
 
-correct_words = []
-translations = []
+correct_words, translations = [], []
 attempt = 1
 
-with open('data.csv') as csv_file:
-    csv_reader = reader(csv_file)
-    for row in csv_reader:
-        correct_words.append(row[0])
-        translations.append(row[1])
+file = open('data.csv', 'r')
+csv = reader(file)
+for row in csv:
+    correct_words.append(row[0])
+    translations.append(row[1])
+file.close()
 
 index = len(correct_words)
-print("Hello! This is a vocabulary trainer.")
+print("Hello! This is a vocabulary trainer.\n")
 
 while len(correct_words) != 0:
     length = len(correct_words)
-    max_len = len(max(translations, key = len)) + 1
     words = ['' for i in range(length)]
     words.append(' ')
     score = 0
@@ -24,10 +23,7 @@ while len(correct_words) != 0:
     for i in range(length):
         while words[index] != '':
             index = randint(0, length - 1)
-
-        comparison = max_len - len(translations[index])
-        comparison = 1
-        word = input(f'"{translations[index]}"{" " * comparison}- ')
+        word = input(f'{i + 1}) "{translations[index]}" - ')
         if word == '':
             word = ' '
         words[index] = word
@@ -40,7 +36,6 @@ while len(correct_words) != 0:
 
         if words[i].lower() != correct_words[i].lower():
             print(f'(Correct answer - {correct_words[i]})')
-
         else:
             print()
             score += 1
@@ -52,7 +47,14 @@ while len(correct_words) != 0:
         del translations[index]
 
     print(f'\nThe result of the attempt #{attempt}:\n    {score} / {length}')
-    attempt += 1
-    input()
+    if len(correct_words) > 0:
+        attempt += 1
+        save = input('\nDo you want to save the wrong words in the new CSV file? [Any key = Yes, n = No]: ')
+        if save.lower() != 'n':
+            file = open('new_data.csv', 'w+')
+            for i in range(0, len(correct_words)):
+                file.write(f'"{correct_words[i]}","{translations[i]}"\n')
+            file.close()
+    print()
 
 print('Congratulations! You answered all words correctly.')
